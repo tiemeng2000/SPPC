@@ -1,0 +1,77 @@
+<html>
+
+<head>
+	<!-- <script src="three.js-master/build/three.js"></script> -->
+	<script src="../leapjs-master/leap-0.6.4.js"></script> 
+	<script src="../leapjs-plugins-master/main/leap-plugins-0.1.11pre.js"></script>
+	<!-- <script src="leapjs-widgets-master/build/leap-widgets-0.1.0.js"></script> -->
+	<!-- <script src="js/OrbitControls.js"></script> -->
+
+	<script src="../d3-master/d3.js"></script>
+</head>
+
+<body>
+	<script TYPE="text/javascript">
+		
+		var dataset = [10,15,6,247,25,156,99,394,406,46]
+		d3.select("body").append("svg");
+
+		function render()
+		{
+			var width = 600;
+			var height = 600;
+
+			var svg = d3.select("body").selectAll("svg")
+					   .attr("width",width)
+					   .attr("height",height)
+			
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect");
+			   
+
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .attr("x",10)
+			   .attr("y",function(d,i){
+					//console.log(d);
+					return i * 30;
+			   })
+			   .attr("width",function(d,i){
+					return d * 10;					
+			   })
+			   .attr("height",28)
+			   .attr("fill","green");
+
+			// svg.selectAll("rect")
+			//    .data(dataset)
+			//    .exit()
+			//    .remove();
+		}
+
+		Leap.loop({hand: function (hand)
+		{
+			var screenPosition = hand.screenPosition (hand.palmPosition);
+			var x = parseInt((screenPosition[0]/50).toPrecision(2));
+			var y = parseInt((screenPosition[1]/50 + 50).toPrecision(2));
+			var z = parseInt((screenPosition[2]/30).toPrecision(2));
+			
+			dataset.pop();
+			dataset.pop();
+			dataset.pop();
+			dataset.push(x);
+			dataset.push(y);
+			dataset.push(z);
+			console.log(dataset);
+			render(dataset);
+			
+		}}).use('screenPosition', {scale: 1});
+		
+
+
+	</script>
+</body>
+
+
+</html>

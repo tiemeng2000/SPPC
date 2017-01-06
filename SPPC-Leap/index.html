@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE-edge">
+		<meta charset="UTF-8">
+		<title>SPPC</title>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" media="screen">	
+		<link rel="stylesheet" type="text/css" href="css/project/project.css" media="screen">
+		<link rel="stylesheet" type="text/css" href="css/tools/jalert.css" media="screen">
+		<script type="text/javascript" src="js/jquery/jquery-2.1.1.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-migrate-1.2.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery.mousewheel.js"></script>
+		<script type="text/javascript" src="js/bootstrap/bootstrap.js"></script>
+		<script type="text/javascript" src="js/d3.v3/d3.v3.js"></script>
+		<script type="text/javascript" src="js/tools/svg-crowbar.js"></script>
+		<script type="text/javascript" src="js/tools/filereader.js"></script>
+		<script type="text/javascript" src="js/tools/colorpicker.js"></script>	
+		<script type="text/javascript" src="js/tools/jalert.js"></script>	
+		
+		<script type="text/javascript">
+			/*Engine Check*/
+			var engine=checkOsAndBrowser();
+			if(engine.IE){
+				jAlert("We're sorry for not supporting IE. :( Please use other browsers.", "Browser Not Supported");
+				document.execCommand("Stop");
+			}
+			function checkOsAndBrowser() {
+			    var _nu = navigator.userAgent,
+			        _os = {
+			            Win : _nu.indexOf('Win') != -1,  //Window OS
+			            Mac : _nu.indexOf('Mac') != -1,  //Mac OS
+			            X11 : _nu.indexOf('X11') != -1,  //X Window系统
+
+			            Firefox: _nu.indexOf('Firefox') != -1, //Firefox浏览器
+			            IE: _nu.indexOf('MSIE') != -1, //ie浏览器
+			            Safari: _nu.indexOf('Safari') != -1, //Safari浏览器
+			            Opera: _nu.indexOf('Opera') != -1, //Opera浏览器
+			            Chrome: _nu.indexOf('Chrome') != -1, //Chrome浏览器
+
+			            Gecko : _nu.indexOf('Gecko') != -1, //Gecke内核
+			            Trident: _nu.indexOf('Trident') != -1, //Trident内核
+			            webkit: _nu.indexOf('WebKit') != -1, //WebKit内核
+			            Presto: _nu.indexOf('Presto') != -1, //Presto内核
+
+			            browser: browser()
+			        }
+			    return _os;
+			}
+			function browser(){ 
+				var ua=window.navigator.userAgent, 
+				ret=""; 
+				if(/Firefox/g.test(ua)){ 
+				ua=ua.split(" "); 
+				ret="Firefox|"+ua[ua.length-1].split("/")[1]; 
+				}else if(/MSIE/g.test(ua)){ 
+				ua=ua.split(";"); 
+				ret="IE|"+ua[1].split(" ")[2]; 
+				}else if(/Opera/g.test(ua)){ 
+				ua=ua.split(" "); 
+				ret="Opera|"+ua[ua.length-1].split("/")[1]; 
+				}else if(/Chrome/g.test(ua)){ 
+				ua=ua.split(" "); 
+				ret="Chrome|"+ua[ua.length-2].split("/")[1]; 
+				}else if(/^apple\s+/i.test(navigator.vendor)){ 
+				ua=ua.split(" "); 
+				ret="Safair|"+ua[ua.length-2].split("/")[1]; 
+				}else{ 
+				ret="未知浏览器"; 
+				} 
+				return ret.split("|"); 
+			} 
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<nav class="navbar navbar-default navbar-static-top" role="navigation">
+			    <div class="container-fluid">
+				<div class="navbar-header">
+				    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-
+				     collapse-1">
+					    <span class="sr-only">Toggle navigation</span>
+					    <span class="icon-bar"></span>
+					    <span class="icon-bar"></span>
+					    <span class="icon-bar"></span>
+				    </button>
+      				<a class="navbar-brand text-center"><strong>Scattering Points in Parallel Coordinates</strong></a>
+			    </div>
+				<div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
+			      	<ul class="nav navbar-nav">
+				        <li class="dropdown">
+				        	<a class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-folder-open"></span> Open<span class="caret"></span></a>
+				        	<ul class="dropdown-menu" role="menu">
+								<li class="openData" id="Iris"><a>Iris Dataset</a></li>
+								<li class="openData" id="Car"><a>Car Dataset</a></li>
+								<li class="divider"></li>
+								<li class="openData" id="Local" data-toggle="modal" data-target="#myModal"><a>Local File</a></li>
+							</ul>
+				        </li>
+				        <li id="saveData"><a><span class="glyphicon glyphicon-floppy-disk"></span> Save</a></li>
+				        <li data-toggle="modal" data-target="#Help"><a><span class="glyphicon glyphicon-question-sign"></span> Help</a></li>
+				        <li data-toggle="modal" data-target="#About"><a><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
+			      	</ul>
+			    </div>
+				<!--
+				<div class="btn-toolbar navbar-right" role="toolbar">
+					<div class="btn-group">
+						<div class="btn-group">
+							<button type="button" class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown" id="Upload">
+								<span class="glyphicon glyphicon-folder-open"></span> Open
+								<span class="caret"></span>
+								<span class="sr-only">Toggle Dropdown</span>
+							</button>
+							
+						</div>
+						<button type="button" class="btn btn-default navbar-btn" id="saveData">
+							<span class="glyphicon glyphicon-floppy-disk"></span> Save
+						</button>
+						<button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#Help">
+							<span class="glyphicon glyphicon-question-sign"></span> Help
+						</button>
+						<button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#About">
+							<span class="glyphicon glyphicon-info-sign"></span> About
+						</button>
+					</div>
+				</div>
+				-->
+				</div>
+			</nav>
+			<!-- Modal -->
+			<div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog modal-sm">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+			        <h4 class="modal-title" id="myModalLabel">Open a local file</h4>
+			      </div>
+			      <div class="modal-body">
+			      <input type="file" id="File"/>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" data-dismiss="modal" id="Confirm">OK</button>
+			        <button type="button" class="btn btn-default" data-dismiss="modal" id="Cansel">Cansel</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			<!-- Modal -->
+			<div class="modal fade bs-example-modal-lg" id="Help" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  	<div class="modal-dialog modal-lg">
+			    	<div class="modal-content">
+			      		<div class="modal-header">
+			        		<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+			        		<h3 class="modal-title" id="myModalLabel">Instructions</h3>
+			      		</div>
+				      	<div class="modal-body">
+					      	<div class="container" style="width:100%;height:400px">
+					      		<div class="row">
+						      			<!--
+						      			<ul class="nav nav-pills nav-stacked" role="tablist">
+						      				<li role="presentation" class="instruction active" id="1"><a href="#">Loading data</a></li>
+						      				<li role="presentation" class="instruction" id="2"><a href="#">2</a></li>
+						      				<li role="presentation" class="instruction" id="3"><a href="#">3</a></li>
+						      			</ul>
+						      			-->
+					      			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+					      				<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+					      					<div class="panel panel-default instruction" id="1">
+					      						<div class="panel-heading">
+											      <h4 class="panel-title" style="cursor:pointer">
+											          Data Loading
+											      </h4>
+										      	</div>
+					      					</div>
+					      					<div class="panel panel-default">
+					      						<div class="panel-heading">
+											      <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="cursor:pointer">
+											          Interactions
+											      </h4>
+										      	</div>
+											    <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel">
+											      <div class="panel-body">
+													<ul class="nav nav-pills nav-stacked" role="tablist">
+														<li class="instruction" id="2_1"><a href="#">Plot Toggling</a></li>
+														<li class="instruction" id="2_2"><a href="#">Brushing</a></li>
+														<li class="instruction" id="2_3"><a href="#">MDS Mode</a></li>
+														<li class="instruction" id="2_4"><a href="#">Axis Exchange</a></li>
+													</ul>
+											      </div>
+											    </div>
+					      					</div>
+					      					<div class="panel panel-default instruction" id="3">
+					      						<div class="panel-heading">
+											      <h4 class="panel-title" style="cursor:pointer">
+											          Result Saving
+											      </h4>
+										      	</div>
+					      					</div>
+					      				</div>
+						      		</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="DataLoading" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content1" src="sources/dataLoading.png" alt="Data Loading">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">Data Loading</h4>
+							      				<p>Load the prepared data or open a data file of your own. Only csv format files are supported. If it's a local file, note that the first line of the file should contain names of all data attributes. Also, the attributes are supposed to be numerical.</p>
+							      				<p><small><strong>Browser Compatability:</strong></br>This function is fully supported by Chrome, FireFox and Opera, not supported by IE. Local file loading is not supported by Safari.</small></p>
+											</div>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="Toggling" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/toggle.png" alt="Toggling">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">Plot Toggling</h4>
+							      				<p>Toggle the scatterplot by double clicking on the plane between neighbouring axes. By default, vertical and horizontal axes of the scatterplot are the left and the right axes of the plane respectively. MDS mode and area brushing are supported only when scatterplots are toggled on.</p>
+											</div>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="AreaBrushing" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/AreaBrushing.png" alt="Brushing_Area">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">Area Brushing</h4>
+							      				<p>Choose a brushing color from the leftside palette. When the scatterplot is toggled on, highlight the scatter points by drawing a lasso around them.</p>
+											</div>
+										</div>
+										<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+											<ul class="pagination">
+											  <li class="page disabled" id="before"><a href="#">&laquo;</a></li>
+											  <li class="page active" id="1"><a href="#">1</a></li>
+											  <li class="page" id="2"><a href="#">2</a></li>
+											  <li class="page" id="3"><a href="#">3</a></li>
+											  <li class="page" id="after"><a href="#">&raquo;</a></li>
+											</ul>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="AxisBrushing" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/AxisBrushing.png" alt="Brushing_Axis">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">Axis Brushing</h4>
+							      				<p>Highlight the data within a certain value range by drawing a line along the target axis to cover the desired range.</p>
+											</div>
+										</div>
+										<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+											<ul class="pagination">
+											  <li class="page" id="before"><a href="#">&laquo;</a></li>
+											  <li class="page" id="1"><a href="#">1</a></li>
+											  <li class="page active" id="2"><a href="#">2</a></li>
+											  <li class="page" id="3"><a href="#">3</a></li>
+											  <li class="page" id="after"><a href="#">&raquo;</a></li>
+											</ul>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="AngularBrushing" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/AngularBrushing.png" alt="Brushing_Angular">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">Angular Brushing</h4>
+							      				<p>When the scatterplot is toggled off, highlight the lines within a certain slope range by drawing an angle to specify the range.</p>
+											</div>
+										</div>
+										<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+											<ul class="pagination">
+											  <li class="page" id="before"><a href="#">&laquo;</a></li>
+											  <li class="page" id="1"><a href="#">1</a></li>
+											  <li class="page" id="2"><a href="#">2</a></li>
+											  <li class="page active" id="3"><a href="#">3</a></li>
+											  <li class="page disabled" id="after"><a href="#">&raquo;</a></li>
+											</ul>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="MDSMode" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/MDSMode.png" alt="MDS_Mode">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">MDS Mode</h4>
+							      				<p>When the scatterplot is toggled on, drag and drop the handler beneath each axis to include or exclude an attribute. When there are more than two attributes in a scatterplot, it turns into an MDS plot of all chosen attributes.</p>
+											</div>
+										</div>
+										<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+											<ul class="pagination">
+											  <li class="page disabled" id="before"><a href="#">&laquo;</a></li>
+											  <li class="page active" id="1"><a href="#">1</a></li>
+											  <li class="page" id="2"><a href="#">2</a></li>
+											  <li class="page" id="after"><a href="#">&raquo;</a></li>
+											</ul>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="DimensionToggle" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/MDSMode2.png" alt="Dimension_Toggle">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">Dimension Toggling</h4>
+							      				<p>Aftering constructing an MDS plot, you could enable/disable some of the component dimensions by clicking on the corresponding handlers. The effect is equal to a drag-and-drop operation on the handler.</p>
+											</div>
+										</div>
+										<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+											<ul class="pagination">
+											  <li class="page" id="before"><a href="#">&laquo;</a></li>
+											  <li class="page" id="1"><a href="#">1</a></li>
+											  <li class="page active" id="2"><a href="#">2</a></li>
+											  <li class="page disabled" id="after"><a href="#">&raquo;</a></li>
+											</ul>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="MDSMode" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/MDSMode.png" alt="MDS_Mode">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">MDS Mode</h4>
+							      				<p>When the scatterplot is toggled on, drag and drop the handler beneath each axis to include or exclude an attribute. When there are more than two attributes in a scatterplot, it turns into an MDS plot of all chosen attributes.</p>
+											</div>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="AxisExchange" style="display:none">
+						      			<div class="media">
+										  <a class="pull-left" href="#">
+										    <img class="media-object help-content2" src="sources/AxisExchange.png" alt="Exchange_Axis">
+										  </a>
+										  <div class="media-body">
+										    <h4 class="media-heading" style="text-align:center">Axis Exchange</h4>
+							      				<p>Exchange positions of two axes by clicking on their handlers successively.</p>
+											</div>
+										</div>
+					      			</div>
+					      			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 help" id="ResultSaving" style="display:none">
+						      			<div class="media">
+										  	<a class="pull-left" href="#">
+											    <img class="media-object help-content2" src="sources/ResultSaving.png" alt="Result Saving">
+											</a>
+										  	<div class="media-body">
+										    	<h4 class="media-heading" style="text-align:center">Result Saving</h4>
+							      				<p>After visual explorations, you can save the results as an svg file for further demonstration purposes.</p>
+							      				<p><small><strong>Browser Compatability:</strong></br>This function is supported by Chrome, FireFox and Opera, but not supported by Safari or IE.</small></p>
+											</div>
+										</div>
+					      			</div>
+					      		</div>
+					      	</div>
+				      	</div>
+			      	</div>
+			    </div>
+			</div>
+			<!-- Modal -->
+			<div class="modal fade bs-example-modal" id="About" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  	<div class="modal-dialog">
+			    	<div class="modal-content">
+				      	<div class="modal-body">
+					      	<div class="row">
+  								<div class="col-lg-12 col-sm-12 col-md-12">
+						        	<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+						        </div>
+						    </div>
+							<div class="row">
+  								<div class="col-lg-12 col-sm-12 col-md-12">
+							  		<div class="thumbnail">
+									  	<a class="pull-right" href="http://vis.pku.edu.cn/">
+						      				<img src="sources/Logo.jpg" alt="PKUVis">
+						      			</a>
+								      	<div class="caption">
+									        <h3>Clarification</h3>
+									        <p>This is an online visualization tool created by PKU Visualization and Visual Analytics Group. The central technique supporting this tool has been published in IEEE VIS 2009 [1].
+										    For more information, please refer to the original paper.</br> </p>
+										    <p>If there are any questions, suggestions or comments, please contact <i>chufan.lai.1990@gmail.com.</i></p>
+										    <p>[1] Xiaoru Yuan, Peihong Guo, He Xiao, Hong Zhou, and Huamin Qu.
+										    Scattering Points in Parallel Coordinates.
+										    IEEE Transactions on Visualization and Computer Graphics (InfoVis'09), 15(6):1001-1008, 2009.
+										    [<a href="http://vis.pku.edu.cn/research/publication/infovis09/tvcg09_sppc.pdf" target="_blank">pdf</a>]</p>
+								      	</div>
+								    </div>
+							    </div>
+						    </div>
+						    <div class="row">
+						    	<div class="col-lg-12 col-sm-12 col-md-12"></div>    	
+								<p style="text-align:center">Copyright © 2014 PKU Visualization and Visual Analytics Group. All rights reserved.</p>
+						    </div>
+				      	</div>
+			      	</div>
+			  	</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 palette">
+					<div class="row">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div id="colorShow"></div>
+						</div>
+					</div>
+					<div class="row" id="colorpicker">
+						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10" id="picker"></div>
+							<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" id="slide"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 svg-container">
+					<svg class="main" id="SPPC">
+						<text style="stroke:black" class="placeholder">Please Open a Data File</text>
+					</svg>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/leapMouse/leap-0.6.4.js"></script> 
+		<script type="text/javascript" src="../leapjs-MouseHands/bin/leapMouseHands-1.1.9.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function () {
+				var controller = new $.LeapG.Controller();
+			});
+		</script>
+		<script type="text/javascript" src="js/project/objects.js"></script>
+		<script type="text/javascript" src="js/project/data.js"></script>
+		<script type="text/javascript" src="js/project/drawing.js"></script>
+		<script type="text/javascript" src="js/project/interaction.js"></script>
+		<script type="text/javascript">	
+			
+
+			/*global variables*/
+			var wid=parseFloat($(".svg-container").css("width")),hei=innerHeight-parseFloat($("nav").css("height"))-parseFloat($(".navbar").css("margin-bottom"))-5;	
+			var svg=d3.select(".main")
+			.attr("width",wid)
+			.attr("height",hei)
+			.append("g")
+			.attr("class","canvas");
+			$(".placeholder")
+			.attr("x",function(){ return wid/2-wid/100*$(this).text().length/2;})
+			.attr("y",hei/2)
+			.css("font-size", wid/50)
+			.css("stroke","none");
+			var dimScale=d3.scale.linear().range([0.06*wid,0.94*wid]), dataScale=d3.scale.linear().range([0.9*hei,0.05*hei]);
+			var title_pos=hei*0.954, max_pos=hei*0.04, min_pos=hei*0.93, hdl_pos=hei*0.975, cir_r=3, elp_r=[23,6], ax_div, ax_scale=0.9, ax_slp=0.05;
+			var dataSet, tDataSet;
+			var prec=2;
+			var dragSign=-1, dragSign, dragObj=createDragObj(-1,true,-1,-1,""), mousePlane=-1, pl_opc=0.7;
+			var aniTime=700, errThres=1e-4;
+			var palette, trimed=false, palDown=false;
+
+			var test=innerHeight;
+
+			
+
+		</script>
+	</body>
+</html>

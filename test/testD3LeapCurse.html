@@ -1,0 +1,119 @@
+<html>
+
+<head>
+	
+	<!-- <script src="three.js-master/build/three.js"></script> -->
+	<script src = "../leapjs-master/leap-0.6.4.js"></script> 
+	<script src = "../leapjs-plugins-master/main/leap-plugins-0.1.11pre.js"></script>
+	<!-- <script src="leapjs-widgets-master/build/leap-widgets-0.1.0.js"></script> -->
+	<!-- <script src="js/OrbitControls.js"></script> -->
+	<script src = "../d3-master/d3.js"></script>
+	<script src = "js/leapmouse.js"></script>
+</head>
+
+<body>
+	<script TYPE="text/javascript">
+		
+
+
+		var dataset = [500,15,6,247,25,156,99,394,406,46]
+		d3.select("body").append("svg");
+		d3.select("body").on("load", render());
+		function render()
+		{
+			var width = 2000;
+			var height = 2000;
+
+			var svg = d3.select("body").selectAll("svg")
+					   .attr("width",width)
+					   .attr("height",height);
+			
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect");
+			   
+
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .attr("x",600)
+			   .attr("y",function(d,i){
+					//console.log(d);
+					return i * 30+300;
+			   })
+			   .attr("width",function(d,i){
+					return d * 10 ;					
+			   })
+			   .attr("height",28)
+			   .attr("fill","green");
+
+			// svg.selectAll("rect")
+			//    .data(dataset)
+			//    .exit()
+			//    .remove();
+		}
+		
+		var leapmouses = {};
+		Leap.loop
+		(
+			function (frame)
+			{
+				frame.hands.forEach
+				( 
+					function (hand, index)
+					{
+						var leapmouse = (  leapmouses[index] || (leapmouses[index] = new LeapMouse() )  );
+						leapmouse.setTransform( hand.screenPosition());
+
+						var screenPosition = hand.screenPosition (hand.palmPosition);
+						var x = parseInt((screenPosition[0]/50).toPrecision(2));
+						var y = parseInt((screenPosition[1]/50 + 50).toPrecision(2));
+						var z = parseInt((screenPosition[2]/30).toPrecision(2));
+						
+						dataset.pop();
+						dataset.pop();
+						dataset.pop();
+						dataset.push(x);
+						dataset.push(y);
+						dataset.push(z);
+						console.log(dataset);
+						render();
+
+					}
+				);	
+
+			}
+		).use('screenPosition', {scale: 0.5});
+
+			
+		var LeapMouse  = function()
+		{
+			var leapmouse = this;
+			var pointer = document.createElement('img');
+			pointer.src = "pic.jpg";
+			pointer.style.position = "absolute";
+			pointer.style.height = 10+'px';
+
+			pointer.onload = function()
+			{
+				leapmouse.setTransform([window.innerWidth/2, window.innerHeight/2], 0);
+				document.body.appendChild(pointer);
+			}
+
+			leapmouse.setTransform = function (position)
+			{
+				pointer.style.left = position[0] - pointer.width/2  + 'px';
+				pointer.style.top  = position[1] - pointer.height/2  -200 + 'px';
+
+				//img.style.transform = 'rotate(' + -rotation +'rad)';			
+			}
+
+		};
+		leapmouses[0] =  new LeapMouse();
+
+
+	</script>
+</body>
+
+
+</html>

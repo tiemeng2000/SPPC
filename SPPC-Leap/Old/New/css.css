@@ -1,0 +1,90 @@
+<style>
+.Lsvg{
+	position: absolute
+}
+
+.Panel:hover{
+	cursor: auto
+}
+
+.Rsvg{
+	position: absolute
+}
+
+.curve path{
+	fill: none;
+	opacity: 0.2;
+	stroke-width: 1;
+	-webkit-transition:opacity 0.5s linear 0.5s
+}
+
+.point{
+	opacity: 0.7;
+	-webkit-transition:opacity 0.5s linear
+}
+
+.point.Invisible{
+	opacity: 0
+}
+
+.Axes path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+  stroke-width:3
+}
+
+.AxBound{
+	fill:none;
+	opacity: 0.8;
+	stroke: #000;
+	stroke-dasharray: 4;
+  	shape-rendering: crispEdges;
+  	stroke-width:1;
+	-webkit-transition: fill 0.5s linear
+}
+
+.AxBound :hover{
+	fill: blue
+}
+
+.Icon{
+	cursor: pointer;
+	fill: #0099FF;
+	stroke: #CC33FF;
+	stroke-width:2
+}
+
+.Icon.IcSel{
+	stroke: #33FF66
+}
+
+circle.Extra{
+	fill:#00FF66
+}
+
+.Faded .begin{
+	opacity: 0.05
+}
+
+.Faded .end{
+	opacity: 0.05
+}
+
+.Interval:hover .curve path{
+	opacity: 0.2;
+}
+
+.Pbrush{
+	stroke-width: 3
+}
+
+text{
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none; 
+}
+</style>/* CSS Document */
+

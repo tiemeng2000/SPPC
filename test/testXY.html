@@ -1,0 +1,69 @@
+<html>
+
+<head>
+	<script src="../three.js-master/build/three.js"></script>
+	<script src="../leapjs-master/leap-0.6.4.js"></script>
+	<script src="../leapjs-plugins-master/main/leap-plugins-0.1.11pre.js"></script>
+
+	<script src="../leapjs-widgets-master/build/leap-widgets-0.1.0.js"></script>
+
+	<script src="js/OrbitControls.js"></script>
+</head>
+
+<body>
+</body>
+
+<SCRIPT TYPE="text/javascript">
+	  
+	// Set up plugins
+	Leap.loop({background: true})
+	.use('transform', {
+	  vr: 'desktop' // Switch to meters.
+	})
+	.use('boneHand', {
+	  targetEl: document.body,
+	  jointColor: new THREE.Color(0x004466),
+	  rendererOps: {antialias: true}
+	})
+	.use('proximity');
+
+
+	// Set up scene
+
+	var scene = Leap.loopController.plugins.boneHand.scene;
+	var camera = Leap.loopController.plugins.boneHand.camera;
+	var renderer = Leap.loopController.plugins.boneHand.renderer;
+	camera.position.set( 0, 0.2, 0.8);
+
+	var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+	//var axisHelper = new THREE.AxisHelper( 0.1 );
+	//scene.add( axisHelper );
+
+	//Set up Plane
+	var planeGeo = new THREE.PlaneGeometry(0.1, 0.2);
+	var material = new THREE.MeshPhongMaterial({side: THREE.DoubleSide, 
+												color: 0xCC0000});
+	
+	var planeMesh1 = new THREE.Mesh(planeGeo, material);
+	planeMesh1.position.setX(0.05);
+	planeMesh1.position.setY(0.1);
+	planeMesh1.name = "planeMesh1";
+
+	var planeMesh2 = new THREE.Mesh(planeGeo, material);
+	planeMesh2.position.setX(-0.10);
+	planeMesh2.position.setY(0.1);
+	planeMesh2.name = "planeMesh2";
+
+	//Add Base to Scene
+	scene.add(planeMesh1);
+	scene.add(planeMesh2);
+
+	var plane1 = new InteractablePlane(planeMesh1, Leap.loopController);
+	var plane2 = new InteractablePlane(planeMesh2, Leap.loopController);
+
+
+
+</SCRIPT>
+
+</html>

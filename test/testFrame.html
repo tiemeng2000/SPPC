@@ -1,0 +1,29 @@
+<html>
+	<head>
+		<script src="../leapjs-master/leap-0.6.4.js"></script>
+		<script src="../leapjs-plugins-master/main/leap-plugins-0.1.11pre.js"></script>
+
+	</head>
+	<body>
+		<h1>FRAME</h1>
+		<div id="output"> </div>
+		<div id ="hands"></div>
+		
+
+
+		<script type="text/javascript">
+			var output = document.getElementById('output');
+			var hands = document.getElementById('hands');
+			Leap.loop(function (frame)
+			{
+				
+				frame.hands.forEach(function (hand, index)
+				{
+					output.innerHTML = 'Frame: ' + frame.id;
+				});
+			});
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,89 @@
+body{
+   -moz-user-select: none; /*Firefox*/
+   -webkit-user-select: none;  /*webkit*/
+   -ms-user-select: none;   /*IE10*/
+   -khtml-user-select: none; /*earlier*/
+   user-select: none;
+}
+
+a{
+	cursor: pointer;
+}
+
+.ax_title{
+	text-align: center
+}
+
+.handler{
+	fill: #BBB;
+	cursor: pointer;
+}
+
+.axis path{
+	stroke-width: 3;
+	stroke: black;
+	fill: none;
+}
+
+.line path{
+	opacity: 0.3;
+	fill: none;
+}
+
+.line path.deep{
+	opacity: 0.6;
+	stroke-width: 3;
+}
+
+#colorShow{
+	border: 1px solid #000;
+	height: 22px;
+}
+
+.dragPath{
+	stroke-width: 2;
+	fill: none;
+}
+
+.main{
+}
+
+.placeholder{
+	fill: #aaa;
+	font-weight: bold;
+}
+
+.openData{
+	cursor: pointer;
+	text-align: left;
+}
+
+.modal-title{
+	text-align: center;
+}
+
+.modal-footer{
+	text-align: center;
+}
+
+.handler.hdl_on.hdlChosen{
+	fill: #ee8ba5;
+}
+
+.handler.hdl_on{
+	fill: #555;
+}
+
+#picker{
+	padding: 0px;
+}
+
+#slide{
+	padding: 0px;
+}
+
+#colorShow{
+	background-color: red;
+	border-radius: 5px;
+	border: 0px;
+}

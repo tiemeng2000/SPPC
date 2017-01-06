@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<script type="text/javascript" src="d3.v3/d3.v3.min.js"></script>
+<script type="text/javascript" src="sylvester/sylvester.js"></script>
+<script type="text/javascript" src="sylvester/sylvester.src.js"></script>
+<script type="text/javascript" src="jQuery/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="data.js"></script>
+<script type="text/javascript" src="drawing.js"></script>
+<script type="text/javascript" src="Interaction.js"></script>
+<script type="text/javascript" src="MDS.js"></script>
+<script type="text/javascript" src="eigen.js"></script>
+<link  rel="stylesheet" type="text/css" href="css.css" />
+<title>SPPC</title>
+</head>
+
+<body>
+
+<script type="text/javascript">
+var wid=innerWidth,hei=innerHeight;
+var pad=~~(wid*0.05),Lwid=(wid-3.5*pad)*0.15,Rwid=(wid-3.5*pad)*0.85;
+var Bmag=parseInt($("body").css("margin-left")),Rleft=~~(Lwid+pad)+Bmag;
+hei = hei - 2*Bmag;
+	
+//初始化函数
+document.body.onload=init;
+function init(){
+getData();
+//PInit();
+var T=setInterval(function(){
+	if(Rdy){
+		clearInterval(T);
+		draw();
+		}
+	},100);//等待数据加载完毕，下下之策
+}
+
+//绘制函数
+function draw(){
+PInit();
+drawSvg();
+drawSPPC();
+drawPanel();
+}
+</script>
+</body>
+</html>
